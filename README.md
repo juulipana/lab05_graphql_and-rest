@@ -56,26 +56,21 @@ Conjunto de condições experimentais:
 
 ## E. Objetos Experimentais  
 O que será testado:
-
-- Uma mesma aplicação com **dois módulos equivalentes**:  
-  - Um implementado em **REST**  
-  - Outro implementado em **GraphQL**  
-- Banco de dados idêntico para ambos  
-- Cenários reais de consulta (ex.: usuários, posts, produtos etc.)
+ 
+- Cenários reais de consulta;
+- Comparar tempo de resposta;
+- Comparar tamanho das respostas;
 
 ---
 
 ## F. Tipo de Projeto Experimental  
-- **Experimento controlado com medidas repetidas**  
-- Todos os tratamentos são aplicados sobre o **mesmo sistema**  
-- Execução automatizada para evitar variações humanas
-
+// TO-DO
 ---
 
 ## G. Quantidade de Medições  
 Para cada tratamento:
 
-- **N ≥ 30 medições por consulta** (seguindo boas práticas estatísticas)  
+- **N ≥ 30 medições por consulta** 
 - Cada cenário será repetido exatamente da mesma forma para REST e GraphQL
 
 ---
@@ -95,18 +90,13 @@ Para cada tratamento:
 - Métricas podem não capturar toda a complexidade de "performance"  
 - Definição das consultas REST e GraphQL pode não ser totalmente equivalente
 
-Aqui vão algumas seções úteis para acrescentar de forma natural ao seu README:
-
-
 ## 2. Ambiente e Ferramentas
 
 O experimento é executado localmente em uma máquina com as seguintes ferramentss principais: Requisições são feitas via requests e os dados armazenados e processados com pandas.
 
-
 ## 3. Coleta e Registro das Métricas
 
 As medições são coletadas automaticamente e registradas em um arquivo CSV. Cada registro contém: nome do cenário, tratamento (REST ou GraphQL), índice da iteração, tempo de resposta em ms e tamanho da resposta em bytes. Logs estruturados são produzidos por structlog para rastreabilidade.
-
 
 ## 5. Análise Estatística Planejada
 
