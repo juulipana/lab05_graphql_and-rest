@@ -100,7 +100,7 @@ Aqui vão algumas seções úteis para acrescentar de forma natural ao seu READM
 
 ## 2. Ambiente e Ferramentas
 
-O experimento é executado localmente em uma máquina com as seguintes ferramentss principais: k6 para geração de carga, PostgreSQL como banco de dados, Docker para isolar serviços e Node.js hospedando as APIs. Requisições são feitas via requests e os dados armazenados e processados com pandas.
+O experimento é executado localmente em uma máquina com as seguintes ferramentss principais: Requisições são feitas via requests e os dados armazenados e processados com pandas.
 
 
 ## 3. Coleta e Registro das Métricas
