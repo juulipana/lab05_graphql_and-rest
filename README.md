@@ -85,3 +85,25 @@ Para cada tratamento:
 ### **De Construção**
 - Métricas podem não capturar toda a complexidade de "performance"  
 - Definição das consultas REST e GraphQL pode não ser totalmente equivalente
+
+Aqui vão algumas seções úteis para acrescentar de forma natural ao seu README:
+
+
+## 2. Ambiente e Ferramentas
+
+O experimento é executado localmente em uma máquina com as seguintes ferramentss principais: k6 para geração de carga, PostgreSQL como banco de dados, Docker para isolar serviços e Node.js hospedando as APIs. Requisições são feitas via requests e os dados armazenados e processados com pandas.
+
+
+## 3. Coleta e Registro das Métricas
+
+As medições são coletadas automaticamente e registradas em um arquivo CSV. Cada registro contém: nome do cenário, tratamento (REST ou GraphQL), índice da iteração, tempo de resposta em ms e tamanho da resposta em bytes. Logs estruturados são produzidos por structlog para rastreabilidade.
+
+
+## 5. Análise Estatística Planejada
+
+Os resultados são avaliados com testes de hipótese apropriados para experimentos pareados:
+
+* Para RQ1 (tempo): teste t pareado ou Wilcoxon Signed‑Rank Test caso a normalidade não seja atendida.
+* Para RQ2 (tamanho): teste t pareado ou teste de Wilcoxon.
+* Normalidade verificada pelo teste de Shapiro‑Wilk.
+* Tamanho de efeito calculado via Cohen’s d para interpretação prática.

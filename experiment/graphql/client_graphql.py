@@ -1,56 +1,44 @@
 import requests
 import time
-import json
 from typing import Dict, Any, Optional, Tuple
-
 
 class GraphQLClient:
     def __init__(self, endpoint: str, timeout: int = 30):
         self.endpoint = endpoint
         self.timeout = timeout
         self.session = requests.Session()
-    
-    def execute_query(self, query: str, variables: Optional[Dict[str, Any]] = None,
-                     headers: Optional[Dict[str, str]] = None) -> Tuple[Dict[str, Any], float, int]:
-        payload = {
-            'query': query
-        }
-        
+
+    def execute_query(
+        self, query: str, variables: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, str]] = None
+    ) -> Tuple[Dict[str, Any], float, int]:
+
+        body = {"query": query}
         if variables:
-            payload['variables'] = variables
-        
-        if headers is None:
-            headers = {}
-        
-        headers.setdefault('Content-Type', 'application/json')
-        
-        start_time = time.perf_counter()
-        
-        try:
-            response = self.session.post(
-                self.endpoint,
-                json=payload,
-                headers=headers,
-                timeout=self.timeout
-            )
-            response.raise_for_status()
-            
-            end_time = time.perf_counter()
-            response_time_ms = (end_time - start_time) * 1000
-            response_size_bytes = len(response.content)
-            
-            result = response.json()
-            
-            if 'errors' in result:
-                raise Exception(f"GraphQL errors: {result['errors']}")
-            
-            return result, response_time_ms, response_size_bytes
-            
-        except requests.exceptions.RequestException as e:
-            end_time = time.perf_counter()
-            response_time_ms = (end_time - start_time) * 1000
-            raise Exception(f"GraphQL request failed: {str(e)}") from e
-    
+            body["variables"] = variables
+
+        hdrs = headers or {}
+        hdrs["Content-Type"] = "application/json"
+
+        t0 = time.perf_counter()
+        res = self.session.post(self.endpoint, json=body, headers=hdrs, timeout=self.timeout)
+        t1 = time.perf_counter()
+
+        ms = (t1 - t0) * 1000
+        size = len(res.content)
+
+        if not res.ok:
+            raise Exception(f"GraphQL request failed: {res.status_code}")
+
+        out = res.json()
+        if "errors" in out:
+            raise Exception("GraphQL execution error")
+
+        data = out.get("data")
+        if data is None:
+            raise Exception("No data returned")
+
+        return data, ms, size
+
     def close(self):
         self.session.close()
-

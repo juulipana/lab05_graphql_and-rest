@@ -2,68 +2,47 @@ import requests
 import time
 from typing import Dict, Any, Optional, Tuple
 
-
 class RESTClient:
     def __init__(self, base_url: str, timeout: int = 30):
-        self.base_url = base_url.rstrip('/')
+        self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.session = requests.Session()
-    
-    def execute_request(self, endpoint: str, method: str = 'GET', 
-                       params: Optional[Dict[str, Any]] = None,
-                       headers: Optional[Dict[str, str]] = None,
-                       json_data: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], float, int]:
+
+    def execute_request(
+        self, endpoint: str, method: str = "GET",
+        params: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, str]] = None,
+        json_data: Optional[Dict[str, Any]] = None
+    ) -> Tuple[Dict[str, Any], float, int]:
+
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
-        
-        start_time = time.perf_counter()
-        
+        hdrs = headers or {}
+
+        t0 = time.perf_counter()
+        res = self.session.request(method, url, params=params, headers=hdrs, json=json_data, timeout=self.timeout)
+        t1 = time.perf_counter()
+
+        ms = (t1 - t0) * 1000
+        size = len(res.content)
+
+        if not res.ok:
+            raise Exception("REST request failed")
+
         try:
-            response = self.session.request(
-                method=method,
-                url=url,
-                params=params,
-                headers=headers,
-                json=json_data,
-                timeout=self.timeout
-            )
-            response.raise_for_status()
-            
-            end_time = time.perf_counter()
-            response_time_ms = (end_time - start_time) * 1000
-            response_size_bytes = len(response.content)
-            
-            try:
-                data = response.json() if response.content else {}
-            except ValueError:
-                data = {'raw_content': response.text[:100]}
-            
-            result = {
-                'status_code': response.status_code,
-                'data': data
-            }
-            
-            return result, response_time_ms, response_size_bytes
-            
-        except requests.exceptions.RequestException as e:
-            end_time = time.perf_counter()
-            response_time_ms = (end_time - start_time) * 1000
-            raise Exception(f"REST request failed: {str(e)}") from e
-    
-    def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None,
-            headers: Optional[Dict[str, str]] = None) -> Tuple[Dict[str, Any], float, int]:
-        return self.execute_request(endpoint, method='GET', params=params, headers=headers)
-    
-    def post(self, endpoint: str, params: Optional[Dict[str, Any]] = None,
-             headers: Optional[Dict[str, str]] = None,
-             json_data: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], float, int]:
+            data = res.json() if res.content else {}
+        except:
+            data = {"raw": res.text[:120]}
+
+        return {"code": res.status_code, "data": data}, ms, size
+
+    def get(self, endpoint: str, params=None, headers=None):
+        return self.execute_request(endpoint, "GET", params=params, headers=headers)
+
+    def post(self, endpoint: str, params=None, headers=None, json_data=None):
+        hdrs = headers or {}
         if json_data:
-            if headers is None:
-                headers = {}
-            headers['Content-Type'] = 'application/json'
-            return self.execute_request(endpoint, method='POST', params=params, 
-                                       headers=headers, json_data=json_data)
-        return self.execute_request(endpoint, method='POST', params=params, headers=headers)
-    
+            hdrs["Content-Type"] = "application/json"
+        return self.execute_request(endpoint, "POST", params=params, headers=hdrs, json_data=json_data)
+
     def close(self):
         self.session.close()
-
