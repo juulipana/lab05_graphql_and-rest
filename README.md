@@ -1,5 +1,14 @@
 # GraphQL vs REST — Experimento Controlado  
+
+## Introdução
 O objetivo deste trabalho é avaliar, de forma quantitativa, se GraphQL realmente traz benefícios práticos quando comparado ao tradicional REST.
+
+### Alunos
+* Juliana Parreiras Guimarães da Cunha
+* Pedro Henrique Marques de Oliveira
+
+### Professor
+* Danilo de Quadros Maia Filho
 
 Nós investigamos duas perguntas principais:
 
